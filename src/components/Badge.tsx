@@ -17,7 +17,7 @@ interface BadgeProps {
 
 export const Badge: React.FC<BadgeProps> = ({ variant, children }) => {
   const styles: Record<BadgeProps['variant'], string> = {
-    pending: 'bg-[var(--color-secondary-light)] text-[var(--color-primary-dark)]',
+    pending: 'bg-[var(--color-secondary-light)] text-[var(--color-primary-dark)]' ,
     assigned: 'bg-[var(--color-primary-light)] text-white',
     picked_up: 'bg-[var(--color-tertiary-light)] text-white',
     delivered: 'bg-emerald-100 text-emerald-800',
