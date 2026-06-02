@@ -46,6 +46,21 @@ function FitBounds({ points }: { points: L.LatLngExpression[] }) {
 }
 
 /**
+ * Custom zoom controls rendered inside the MapContainer.
+ */
+function ZoomButtons() {
+  const map = useMap();
+  return (
+    <div style={{ position: 'absolute', bottom: 16, right: 16, zIndex: 1000, display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div style={{ background: '#fff', borderRadius: 8, border: '1px solid #e0e3e5', boxShadow: '0 2px 6px rgba(0,0,0,.06)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        <button onClick={() => map.zoomIn()} style={{ padding: '8px 12px', border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 16, color: '#191c1e', borderBottom: '1px solid #e0e3e5' }}>＋</button>
+        <button onClick={() => map.zoomOut()} style={{ padding: '8px 12px', border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 16, color: '#191c1e' }}>−</button>
+      </div>
+    </div>
+  );
+}
+
+/**
  * Custom marker icon – green filled location pin using SVG
  */
 function createMarkerIcon(status: string) {
@@ -186,10 +201,7 @@ export default function LiveRiderMap() {
   const offlineCount = riders.filter(r => r.status === 'offline').length;
 
   const points = riders
-    .filter(r => {
-      const ok = r.location && typeof r.location.lat === 'number' && typeof r.location.lng === 'number';
-      return ok && (includeOffline || r.status === 'available');
-    })
+    .filter(r => r.location && typeof r.location.lat === 'number' && typeof r.location.lng === 'number')
     .map(r => [r.location!.lat, r.location!.lng] as L.LatLngExpression);
 
   /* ─────────────── RENDER ─────────────── */
@@ -220,7 +232,7 @@ export default function LiveRiderMap() {
         }
         .lrm-card {
           background: #fff; border-radius: 12px; border: 1px solid #e0e3e5;
-          padding: 20px; display: flex; flex-direction: column; gap: 14;
+          padding: 20px; display: flex; flex-direction: column; gap: 14px;
         }
         .lrm-card-title {
           font-size: 11px; font-weight: 600; color: #76777d;
@@ -275,20 +287,15 @@ export default function LiveRiderMap() {
           <label htmlFor="includeOffline">Offline</label>
         </div>
 
-        {/* Zoom controls */}
-        <div style={{ position: 'absolute', bottom: 16, right: 16, zIndex: 1000, display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <div style={{ background: '#fff', borderRadius: 8, border: '1px solid #e0e3e5', boxShadow: '0 2px 6px rgba(0,0,0,.06)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-            <button onClick={() => document.querySelector<any>('.leaflet-container')?.__leaflet_map?.zoomIn()} style={{ padding: '8px 12px', border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 16, color: '#191c1e', borderBottom: '1px solid #e0e3e5' }}>＋</button>
-            <button onClick={() => document.querySelector<any>('.leaflet-container')?.__leaflet_map?.zoomOut()} style={{ padding: '8px 12px', border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 16, color: '#191c1e' }}>−</button>
-          </div>
-        </div>
+
 
         {/* Map */}
         {!isLoading && (
           <MapContainer center={[12.9716, 77.5946] as L.LatLngExpression} zoom={12} scrollWheelZoom={true} zoomControl={false} attributionControl={false} style={{ width: '100%', height: '100%' }}>
             <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" />
             <FitBounds points={points} />
-            {riders.filter(r => includeOffline || r.status === 'available').map(r => {
+            <ZoomButtons />
+            {riders.map(r => {
               const pos = r.location?.lat && r.location?.lng ? ([r.location.lat, r.location.lng] as L.LatLngExpression) : null;
               return pos && (
                 <Marker key={r.id} position={pos} icon={createMarkerIcon(r.status) as any}>
