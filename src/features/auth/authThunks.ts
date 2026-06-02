@@ -1,6 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { authService } from './authService';
 import type { LoginDto, RegisterDto, AuthResponse } from './types';
+import { getErrorMessage } from '../../api/errorHelper';
 
 export const loginUser = createAsyncThunk<
   AuthResponse,
@@ -9,9 +10,8 @@ export const loginUser = createAsyncThunk<
 >('auth/login', async (credentials, thunkAPI) => {
   try {
     return await authService.login(credentials);
-  } catch (error: any) {
-    const message = error.response?.data?.message || 'Login failed';
-    return thunkAPI.rejectWithValue(message);
+  } catch (error) {
+    return thunkAPI.rejectWithValue(getErrorMessage(error, 'Login failed'));
   }
 });
 
@@ -22,9 +22,8 @@ export const registerUser = createAsyncThunk<
 >('auth/register', async (userData, thunkAPI) => {
   try {
     return await authService.register(userData);
-  } catch (error: any) {
-    const message = error.response?.data?.message || 'Registration failed';
-    return thunkAPI.rejectWithValue(message);
+  } catch (error) {
+    return thunkAPI.rejectWithValue(getErrorMessage(error, 'Registration failed'));
   }
 });
 
@@ -35,8 +34,8 @@ export const seedDatabase = createAsyncThunk<
 >('auth/seed', async (_, thunkAPI) => {
   try {
     return await authService.seed();
-  } catch (error: any) {
-    const message = error.response?.data?.message || 'Seeding failed';
-    return thunkAPI.rejectWithValue(message);
+  } catch (error) {
+    return thunkAPI.rejectWithValue(getErrorMessage(error, 'Seeding failed'));
   }
 });
+

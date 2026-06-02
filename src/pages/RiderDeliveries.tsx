@@ -45,8 +45,8 @@ export const RiderDeliveries: React.FC = () => {
         dispatch(fetchRiderOrders()).unwrap(),
         dispatch(fetchAllRiders()).unwrap(),
       ]);
-    } catch (err: any) {
-      addToast(err || 'Failed to fetch delivery logs', 'error');
+    } catch (err) {
+      addToast(typeof err === 'string' ? err : 'Failed to fetch delivery logs', 'error');
     }
   };
 
@@ -93,8 +93,8 @@ export const RiderDeliveries: React.FC = () => {
       addToast(`Availability updated to: ${targetStatus}`, 'success');
       setConfirmOfflineModal(false);
       fetchRiderData();
-    } catch (err: any) {
-      addToast(err || 'Failed to update status', 'error');
+    } catch (err) {
+      addToast(typeof err === 'string' ? err : 'Failed to update status', 'error');
     }
   };
 
@@ -145,8 +145,8 @@ export const RiderDeliveries: React.FC = () => {
 
       // Refresh list
       fetchRiderData();
-    } catch (err: any) {
-      addToast(err || 'Failed to update order', 'error');
+    } catch (err) {
+      addToast(typeof err === 'string' ? err : 'Failed to update order', 'error');
     } finally {
       setActionLoading(false);
     }
@@ -163,8 +163,8 @@ export const RiderDeliveries: React.FC = () => {
 
       await dispatch(updateRiderLocation({ lat: nextLat, lng: nextLng })).unwrap();
       addToast('GPS location packet dispatched to Redis', 'success');
-    } catch (err: any) {
-      addToast(err || 'Failed to sync location telemetry', 'error');
+    } catch (err) {
+      addToast(typeof err === 'string' ? err : 'Failed to sync location telemetry', 'error');
     } finally {
       setLocationSending(false);
     }
@@ -351,7 +351,7 @@ export const RiderDeliveries: React.FC = () => {
               <select
                 value={selectedStatus}
                 onChange={(e) => {
-                  setSelectedStatus(e.target.value as any);
+                  setSelectedStatus(e.target.value as 'picked_up' | 'delivered' | 'failed' | '');
                   setProofPhoto('');
                   setFailureReason('');
                 }}

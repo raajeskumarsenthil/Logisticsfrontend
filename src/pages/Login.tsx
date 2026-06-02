@@ -44,8 +44,8 @@ export const Login: React.FC = () => {
       if (resultAction.user.role === 'admin') navigate('/dashboard');
       else if (resultAction.user.role === 'client') navigate('/orders');
       else if (resultAction.user.role === 'rider') navigate('/my-deliveries');
-    } catch (err: any) {
-      addToast(err || 'Invalid credentials', 'error');
+    } catch (err) {
+      addToast(typeof err === 'string' ? err : 'Invalid credentials', 'error');
     }
   };
 

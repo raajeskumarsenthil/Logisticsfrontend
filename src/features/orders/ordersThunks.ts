@@ -1,14 +1,15 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { ordersService } from './ordersService';
 import type { Order, CreateOrderDto, UpdateOrderStatusDto } from './types';
+import { getErrorMessage } from '../../api/errorHelper';
 
 export const fetchAdminOrders = createAsyncThunk<Order[], void, { rejectValue: string }>(
   'orders/fetchAdmin',
   async (_, thunkAPI) => {
     try {
       return await ordersService.fetchAdminOrders();
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.response?.data?.message || 'Failed to fetch admin orders');
+    } catch (error) {
+      return thunkAPI.rejectWithValue(getErrorMessage(error, 'Failed to fetch admin orders'));
     }
   }
 );
@@ -18,8 +19,8 @@ export const fetchClientOrders = createAsyncThunk<Order[], void, { rejectValue: 
   async (_, thunkAPI) => {
     try {
       return await ordersService.fetchClientOrders();
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.response?.data?.message || 'Failed to fetch client orders');
+    } catch (error) {
+      return thunkAPI.rejectWithValue(getErrorMessage(error, 'Failed to fetch client orders'));
     }
   }
 );
@@ -29,8 +30,8 @@ export const fetchRiderOrders = createAsyncThunk<Order[], void, { rejectValue: s
   async (_, thunkAPI) => {
     try {
       return await ordersService.fetchRiderOrders();
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.response?.data?.message || 'Failed to fetch rider deliveries');
+    } catch (error) {
+      return thunkAPI.rejectWithValue(getErrorMessage(error, 'Failed to fetch rider deliveries'));
     }
   }
 );
@@ -40,8 +41,8 @@ export const createOrder = createAsyncThunk<Order, CreateOrderDto, { rejectValue
   async (orderData, thunkAPI) => {
     try {
       return await ordersService.createOrder(orderData);
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.response?.data?.message || 'Failed to create order');
+    } catch (error) {
+      return thunkAPI.rejectWithValue(getErrorMessage(error, 'Failed to create order'));
     }
   }
 );
@@ -53,7 +54,8 @@ export const updateOrderStatus = createAsyncThunk<
 >('orders/updateStatus', async ({ id, data }, thunkAPI) => {
   try {
     return await ordersService.updateOrderStatus(id, data);
-  } catch (error: any) {
-    return thunkAPI.rejectWithValue(error.response?.data?.message || 'Failed to update status');
+  } catch (error) {
+    return thunkAPI.rejectWithValue(getErrorMessage(error, 'Failed to update status'));
   }
 });
+

@@ -33,8 +33,8 @@ export const Register: React.FC = () => {
       await dispatch(registerUser({ name, email, password, role })).unwrap();
       addToast('Registration successful! Please login.', 'success');
       navigate('/login');
-    } catch (err: any) {
-      addToast(err || 'Registration failed', 'error');
+    } catch (err) {
+      addToast(typeof err === 'string' ? err : 'Registration failed', 'error');
     }
   };
 
@@ -124,7 +124,7 @@ export const Register: React.FC = () => {
               <label className="block text-xs font-bold text-[var(--color-primary)] mb-1">Role</label>
               <select
                 value={role}
-                onChange={(e) => setRole(e.target.value as any)}
+                onChange={(e) => setRole(e.target.value as 'client' | 'rider')}
                 className="w-full px-3 py-2.5 bg-white border border-[var(--color-neutral-light)] rounded-lg focus:ring-2 focus:ring-[var(--color-primary-light)] focus:border-transparent transition-all outline-none text-sm text-[var(--color-neutral-text)] shadow-sm"
               >
                 <option value="client">Client (Place Orders)</option>

@@ -4,6 +4,8 @@ import { type AppDispatch, type RootState } from '../store/store';
 import { fetchAdminOrders } from '../features/orders';
 import { fetchAllRiders, updateRiderStatus as thunkUpdateRiderStatus } from '../features/riders';
 import { fetchAnalyticsSummary } from '../features/analytics';
+import type { Order } from '../features/orders/types';
+import type { Rider } from '../features/riders/types';
 import { connectSocket, disconnectSocket } from '../socket';
 import { Card } from '../components/Card';
 import { Badge } from '../components/Badge';
@@ -42,8 +44,8 @@ export const AdminDashboard: React.FC = () => {
         dispatch(fetchAllRiders()).unwrap(),
         dispatch(fetchAnalyticsSummary()).unwrap(),
       ]);
-    } catch (err: any) {
-      addToast(err || 'Error fetching dashboard data', 'error');
+    } catch (err) {
+      addToast(typeof err === 'string' ? err : 'Error fetching dashboard data', 'error');
     }
   };
 
@@ -59,7 +61,7 @@ export const AdminDashboard: React.FC = () => {
       fetchDashboardData();
     });
 
-    socket.on('order_status_changed', (data: { orderId: string; status: any; timeline: any[] }) => {
+    socket.on('order_status_changed', (data: { orderId: string; status: Order['status']; timeline: Order['timeline'] }) => {
       addToast(`Order #${data.orderId.slice(-6)} status updated to ${data.status.replace('_', ' ')}`, 'info');
       fetchDashboardData();
     });
@@ -85,7 +87,7 @@ export const AdminDashboard: React.FC = () => {
     };
   }, [dispatch]);
 
-  const handleToggleRider = (rider: any) => {
+  const handleToggleRider = (rider: Rider) => {
     const isCurrentlyOnline = rider.status === 'available';
     const nextStatus = isCurrentlyOnline ? 'offline' : 'available';
 
@@ -108,8 +110,8 @@ export const AdminDashboard: React.FC = () => {
       addToast(`Rider status set to ${status}`, 'success');
       setConfirmModal(null);
       fetchDashboardData();
-    } catch (err: any) {
-      addToast(err || 'Failed to toggle rider status', 'error');
+    } catch (err) {
+      addToast(typeof err === 'string' ? err : 'Failed to toggle rider status', 'error');
     }
   };
 
@@ -274,7 +276,7 @@ export const AdminDashboard: React.FC = () => {
                                     Delivery Stepper Flow
                                   </h4>
                                   <div className="relative border-l border-[var(--color-secondary-light)] pl-4 space-y-4 text-xs">
-                                    {order.timeline.map((evt: any, i: number) => (
+                                    {order.timeline.map((evt, i) => (
                                       <div key={i} className="relative">
                                         <span className="absolute -left-[21px] top-0.5 w-3.5 h-3.5 rounded-full bg-white border-2 border-[var(--color-primary)] flex items-center justify-center" />
                                         <div className="font-bold text-[var(--color-neutral-text)] capitalize">
@@ -401,9 +403,9 @@ export const AdminDashboard: React.FC = () => {
                               {statusLabel}
                             </span>
                           </p>
-                          {(rider as any).location && (
+                          {rider.location && (
                             <p className="text-[9px] text-[var(--color-secondary)] flex items-center gap-0.5 mt-0.5">
-                              <MdMap size={9} /> GPS: {(rider as any).location.lat.toFixed(3)}, {(rider as any).location.lng.toFixed(3)}
+                              <MdMap size={9} /> GPS: {rider.location.lat.toFixed(3)}, {rider.location.lng.toFixed(3)}
                             </p>
                           )}
                         </div>

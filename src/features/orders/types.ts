@@ -9,7 +9,7 @@ export interface Order {
   status: 'pending' | 'assigned' | 'picked_up' | 'delivered' | 'failed';
   proofPhoto?: string;
   failureReason?: string;
-  timeline: { status: string; timestamp: string }[];
+  timeline: { status: string; timestamp: string; note?: string }[];
   timeTakenMinutes?: number;
   createdAt?: string;
   updatedAt?: string;

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { type AppDispatch, type RootState } from '../store/store';
 import { fetchClientOrders, createOrder } from '../features/orders';
+import type { Order } from '../features/orders/types';
 
 import { connectSocket, disconnectSocket } from '../socket';
 import { Card } from '../components/Card';
@@ -30,14 +31,14 @@ export const ClientOrders: React.FC = () => {
   const countdownIntervalRef = useRef<number | null>(null);
 
   // Modal State
-  const [selectedOrderForTimeline, setSelectedOrderForTimeline] = useState<any | null>(null);
+  const [selectedOrderForTimeline, setSelectedOrderForTimeline] = useState<Order | null>(null);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const fetchMyOrders = async () => {
     try {
       await dispatch(fetchClientOrders()).unwrap();
-    } catch (err: any) {
-      addToast(err || 'Failed to load your orders', 'error');
+    } catch (err) {
+      addToast(typeof err === 'string' ? err : 'Failed to load your orders', 'error');
     }
   };
 
@@ -52,7 +53,7 @@ export const ClientOrders: React.FC = () => {
       addToast(`Your order has been assigned to ${data.riderName}`, 'info');
     });
 
-    socket.on('order_status_changed', (data: { orderId: string; status: any; timeline: any[] }) => {
+    socket.on('order_status_changed', (data: { orderId: string; status: Order['status']; timeline: Order['timeline'] }) => {
       if (data.status === 'delivered') {
         addToast('Your order has been delivered! 🎉', 'success');
       } else {
@@ -98,12 +99,13 @@ export const ClientOrders: React.FC = () => {
       }
       // Refresh list
       fetchMyOrders();
-    } catch (err: any) {
-      if (err.includes && err.includes('No riders available')) {
+    } catch (err) {
+      const errMsg = typeof err === 'string' ? err : 'Failed to place order';
+      if (errMsg.includes && errMsg.includes('No riders available')) {
         addToast('No riders available. Starting countdown timer.', 'error');
         startRetryCountdown(60);
       } else {
-        addToast(err || 'Failed to place order', 'error');
+        addToast(errMsg, 'error');
       }
     } finally {
       setSubmitting(false);
@@ -337,7 +339,7 @@ export const ClientOrders: React.FC = () => {
                 Tracking Timeline Steps
               </h4>
               <div className="relative border-l border-[var(--color-secondary-light)] pl-4 space-y-4 text-xs">
-                {selectedOrderForTimeline.timeline?.map((evt: any, i: number) => (
+                {selectedOrderForTimeline.timeline?.map((evt, i) => (
                   <div key={i} className="relative">
                     <span className="absolute -left-[21px] top-0.5 w-3.5 h-3.5 rounded-full bg-white border-2 border-[var(--color-primary)] flex items-center justify-center" />
                     <div className="font-bold text-[var(--color-neutral-text)] capitalize">
