@@ -16,9 +16,15 @@ const updateRiderLocation = async (data: UpdateRiderLocationDto): Promise<{ mess
   const response = await httpClient.patch(ENDPOINTS.RIDERS.LOCATION, data);
   return response.data;
 };
+  const fetchRiderLocations = async (includeOffline: boolean = false): Promise<Rider[]> => {
+    const response = await httpClient.get(`${ENDPOINTS.RIDERS.LOCATIONS}?includeOffline=${includeOffline}`);
+    return response.data;
+  };
 
-export const ridersService = {
-  fetchAllRiders,
-  updateRiderStatus,
-  updateRiderLocation,
-};
+  export const ridersService = {
+    fetchAllRiders,
+    updateRiderStatus,
+    updateRiderLocation,
+    fetchRiderLocations,
+  };
+

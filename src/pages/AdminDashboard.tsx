@@ -7,12 +7,12 @@ import { fetchAnalyticsSummary } from '../features/analytics';
 import type { Order } from '../features/orders/types';
 import type { Rider } from '../features/riders/types';
 import { connectSocket, disconnectSocket } from '../socket';
+import LiveRiderMap from '../components/LiveRiderMap';
 import { Card } from '../components/Card';
 import { Badge } from '../components/Badge';
 import { Button } from '../components/Button';
 import { Modal } from '../components/Modal';
 import { useToast } from '../components/Toast';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { MdMap, MdPerson, MdWarning, MdCheckCircle, MdAccessTime, MdRefresh } from 'react-icons/md';
 
 export const AdminDashboard: React.FC = () => {
@@ -126,36 +126,32 @@ export const AdminDashboard: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-[var(--color-neutral-bg)] p-6">
+    <div className="page-container">
       {/* Header */}
-      <div className="sticky top-0 z-50 bg-[var(--color-neutral-bg)]/95 backdrop-blur-sm pt-4 -mx-6 px-6 flex flex-col md:flex-row md:items-center justify-between mb-6 pb-4 border-b border-[var(--color-neutral-light)]">
-        <div className="flex items-center gap-3">
-          <img src="/image.png" alt="LogisticsPro" className="h-20 object-contain -my-4" />
-          <div>
-            <h1 className="text-2xl font-black text-[var(--color-primary)] tracking-tight">Admin Control Panel</h1>
-            <p className="text-xs text-[var(--color-secondary)] mt-0.5">Real-time logistics flow, order assignment rules & rider telemetry.</p>
+      <div className="sticky-header -mx-4 sm:-mx-5 lg:-mx-8 px-4 sm:px-5 lg:px-8 py-3 mb-6 border-b border-[var(--color-neutral-light)]">
+        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+          <div className="flex items-center gap-3">
+            <img src="/image.png" alt="LogisticsPro" className="object-contain h-14 sm:h-16" />
+            <div>
+              <h1 className="text-lg sm:text-2xl font-black text-[var(--color-primary)] tracking-tight">Admin Control Panel</h1>
+              <p className="text-xs text-[var(--color-secondary)] mt-0.5 hidden sm:block">Real-time logistics flow, order assignment & rider telemetry.</p>
+            </div>
           </div>
-        </div>
-        <div className="mt-4 md:mt-0 flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-[var(--color-primary-light)]/10 px-3 py-1.5 rounded-full mr-2">
-            <MdPerson className="text-[var(--color-primary)]" size={16} />
-            <span className="text-sm font-semibold text-[var(--color-primary)]">{user?.name || 'Admin'}</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-2 bg-[var(--color-primary-light)]/10 px-3 py-1.5 rounded-full">
+              <MdPerson className="text-[var(--color-primary)]" size={16} />
+              <span className="text-sm font-semibold text-[var(--color-primary)]">{user?.name || 'Admin'}</span>
+            </div>
+            <Button variant="secondary" onClick={fetchDashboardData} size="sm" className="gap-2">
+              <MdRefresh size={18} /> <span className="hidden sm:inline">Refresh</span>
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setShowLogoutModal(true)}>Logout</Button>
           </div>
-          <Button variant="secondary" onClick={fetchDashboardData} size="sm" className="gap-2">
-            <MdRefresh size={18} /> Refresh Data
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowLogoutModal(true)}
-          >
-            Logout
-          </Button>
         </div>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-2 gap-3 mb-6 lg:grid-cols-4 sm:gap-4 lg:gap-6 sm:mb-8">
         <Card className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-lg bg-[var(--color-primary-light)]/20 flex items-center justify-center text-[var(--color-primary)]">
             <MdAccessTime size={20} />
@@ -179,7 +175,7 @@ export const AdminDashboard: React.FC = () => {
         </Card>
 
         <Card className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600">
+          <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-100 text-emerald-600">
             <MdCheckCircle size={20} />
           </div>
           <div>
@@ -199,21 +195,28 @@ export const AdminDashboard: React.FC = () => {
         </Card>
       </div>
 
+      {/* Live Rider Map */}
+      <Card title="Live Rider Map" subtitle="Real‑time positions of riders">
+        <div className="-mx-5 sm:mx-0">
+          <LiveRiderMap />
+        </div>
+      </Card>
+
       {/* Main Grid: Table & Sidebar */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 gap-6 mt-4 xl:grid-cols-4 lg:gap-8">
         {/* Left Side: Order List */}
-        <div className="lg:col-span-3 space-y-6">
+        <div className="space-y-6 xl:col-span-3">
           <Card title="Live Order Registry" subtitle="Urgent orders are pinned to the top. Expand rows to monitor timeline details.">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
+              <table className="w-full text-sm text-left">
                 <thead>
                   <tr className="border-b border-[var(--color-neutral-light)] text-[var(--color-secondary)] text-xs uppercase font-semibold">
-                    <th className="py-3 px-4">Order ID</th>
-                    <th className="py-3 px-4">Customer</th>
-                    <th className="py-3 px-4">Priority</th>
-                    <th className="py-3 px-4">Rider</th>
-                    <th className="py-3 px-4">Status</th>
-                    <th className="py-3 px-4">Action</th>
+                    <th className="px-4 py-3">Order ID</th>
+                    <th className="px-4 py-3">Customer</th>
+                    <th className="px-4 py-3">Priority</th>
+                    <th className="px-4 py-3">Rider</th>
+                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[var(--color-neutral-light)]">
@@ -303,37 +306,10 @@ export const AdminDashboard: React.FC = () => {
           </Card>
 
           {/* Analytics Panel */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card title="Zone Volume Distribution" subtitle="Order counts grouped by destination zones.">
-              <div className="h-64 mt-2">
-                {summary && summary.zoneWiseSummary?.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={summary.zoneWiseSummary}>
-                      <XAxis dataKey="zone" stroke="#94a3b8" fontSize={11} tickLine={false} />
-                      <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: '#0f172a',
-                          borderColor: '#1e293b',
-                          color: '#f8fafc',
-                          borderRadius: '8px',
-                          fontSize: '12px',
-                        }}
-                      />
-                      <Bar dataKey="totalOrders" fill="#6366f1" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className="h-full flex items-center justify-center text-slate-500 text-sm">
-                    No zone data available
-                  </div>
-                )}
-              </div>
-            </Card>
-
+          <div className="grid grid-cols-1 gap-6">
             <Card title="Rider Leaderboard" subtitle="Success metrics and average durations.">
-              <div className="overflow-y-auto max-h-64 mt-2">
-                <table className="w-full text-left text-xs">
+              <div className="mt-2 overflow-y-auto max-h-64">
+                <table className="w-full text-xs text-left">
                   <thead>
                     <tr className="border-b border-[var(--color-neutral-light)] text-[var(--color-secondary-dark)] uppercase pb-2">
                       <th className="pb-2">Rider</th>
@@ -366,11 +342,11 @@ export const AdminDashboard: React.FC = () => {
         </div>
 
         {/* Right Side: Rider Status Sidebar */}
-        <div className="space-y-6">
+        <div className="space-y-6 xl:col-span-1">
           <Card title="Rider Sidebar" subtitle="Online status and active workload.">
-            <div className="space-y-4 mt-2">
+            <div className="mt-2 space-y-4">
               {riders.length === 0 ? (
-                <p className="text-xs text-slate-500 text-center py-4">No riders registered in DB.</p>
+                <p className="py-4 text-xs text-center text-slate-500">No riders registered in DB.</p>
               ) : (
                 riders.map((rider) => {
                   // available = green | busy = yellow (activeOrders > 0 and status available) | offline = grey

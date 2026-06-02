@@ -16,10 +16,19 @@
   --color-tertiary-light: #bb977c;
   --color-tertiary-dark: #896245;
 
-  --color-neutral-bg: #F8FAFC; /* Neutral */
+  --color-neutral-bg: #F8FAFC;
   --color-neutral-text: #1E293B;
   --color-neutral-light: #e2e8f0;
   --color-neutral-dark: #0f172a;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -27,5 +36,57 @@ body {
   background-color: var(--color-neutral-bg);
   color: var(--color-neutral-text);
   margin: 0;
+  padding: 0;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
+
+/* Safe area padding for mobile notches */
+.safe-top    { padding-top: env(safe-area-inset-top, 0px); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+
+/* Responsive page container */
+.page-container {
+  width: 100%;
+  min-height: 100vh;
+  padding: 16px;
+}
+@media (min-width: 640px) {
+  .page-container { padding: 20px; }
+}
+@media (min-width: 1024px) {
+  .page-container { padding: 24px 32px; }
+}
+
+/* Sticky header that works on all sizes */
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: rgba(248, 250, 252, 0.97);
+  backdrop-filter: blur(6px);
+}
+
+/* Overflow-x safe tables */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Touch-friendly tap targets */
+button, a, [role="button"] {
+  min-height: 36px;
+}
+
+/* Fix Leaflet z-index on mobile */
+.leaflet-container {
+  z-index: 0 !important;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }

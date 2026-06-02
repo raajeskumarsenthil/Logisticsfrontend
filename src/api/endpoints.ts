@@ -14,6 +14,7 @@ export const ENDPOINTS = {
     BASE: '/riders',
     STATUS: (id: string) => `/riders/${id}/status`,
     LOCATION: '/riders/location',
+    LOCATIONS: '/riders/locations',
   },
   ANALYTICS: {
     SUMMARY: '/analytics/summary',

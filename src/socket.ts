@@ -6,9 +6,7 @@ export let socket: Socket | null = null;
 
 export const connectSocket = (): Socket => {
   if (!socket) {
-    socket = io(WS_URL, {
-      transports: ['websocket'],
-    });
+    socket = io(WS_URL);
     console.log('Socket.io connected to:', WS_URL);
   }
   return socket;
